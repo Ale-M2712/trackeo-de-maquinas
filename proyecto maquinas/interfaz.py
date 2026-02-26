@@ -16,13 +16,12 @@ class MainWindow(QWidget):
         self.layout_izquierdo = QVBoxLayout() #qvboxlayout es un layout vertical ,si fuera qhboxlayout seria horizontal
         
     
+    
         # --- Menú derecho ---
         self.layout_derecho = QVBoxLayout() 
         label_derecho = QLabel("Menú derecho")
-        boton_derecho = QPushButton("Botón derecho")
-        boton_derecho.clicked.connect(lambda: print("Botón derecho clickeado"))
         self.layout_derecho.addWidget(label_derecho)
-        self.layout_derecho.addWidget(boton_derecho)
+        
 
         # Agregar los layouts al layout principal
         
@@ -30,16 +29,43 @@ class MainWindow(QWidget):
         self.layout.addLayout(self.layout_derecho, stretch=4)
 
         self.setLayout(self.layout)
-        self.lista_maquinas() #llama a la funcion que muestra las maquinas en el menu izquierdo
+        # la lista de máquinas se poblará cuando la ventana se muestre
+        # mediante showEvent para que tenga un tamaño válido
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        # ahora la geometría es correcta, rellenar los botones
+        self.lista_maquinas()
+
     def lista_maquinas(self):
+        # vaciar el layout izquierdo antes de rellenar
+        while self.layout_izquierdo.count():
+            item = self.layout_izquierdo.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
         lista = cdb.obtener_maquinas() #obtiene la lista de maquinas de la base de datos
         for maquina in lista:
             boton = QPushButton(maquina)
-            boton.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            boton.setMinimumHeight(int(self.height() * 0.3))
-            boton.setStyleSheet("background-color: lightblue; color: black;")
+            # permitir que cada botón se expanda verticalmente para ocupar el espacio disponible
+            boton.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+            boton.setStyleSheet("""
+        QPushButton {
+            background-color: steelblue;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        QPushButton:hover {
+            background-color: dodgerblue;
+        }
+    """)
+
             boton.clicked.connect(lambda _, m=maquina: print(f"Botón de {m} clickeado"))
             self.layout_izquierdo.addWidget(boton)
+
+
+            
 if __name__ == "__main__": #solo se ejecuta si corro este archivo
     app = QtWidgets.QApplication(sys.argv) #crea la aplicacion
     window = MainWindow() #crea la ventana que es un objeto de la clase MainWindow
