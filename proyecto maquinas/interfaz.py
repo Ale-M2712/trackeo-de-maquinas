@@ -43,7 +43,7 @@ class MainWindow(QWidget):
         lista = cdb.obtener_maquinas()
 
         for maquina in lista:
-            boton = QPushButton(maquina)
+            boton = QPushButton(cdb.extraer_segun_id(maquina, "nombre"))
             # Botones expansivos en ancho, altura fija
             boton.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
             boton.setMinimumHeight(40)
@@ -73,7 +73,7 @@ class MainWindow(QWidget):
                 item.widget().deleteLater()
 
         # Mostrar detalles de la máquina seleccionada
-        label = QLabel(f"Detalles de {nombre}")
+        label = QLabel(f"Detalles de {cdb.extraer_segun_id(nombre, 'nombre')}")
         label.setStyleSheet("font-size: 16px; background-color: lightyellow; padding: 10px; color:black;")
         self.layout_derecho.addWidget(label)
 

@@ -63,9 +63,16 @@ def obtener_maquinas():#(anda) obtiene todas las maquinas de la base de datos
     engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
     with engine.connect() as connection:
         result = connection.execute(sqlalchemy.text('''
-            SELECT nombre FROM maquinas
+            SELECT id FROM maquinas
         '''))
         return [row[0] for row in result.fetchall()] #devuelve una lista con los nombres de las maquinas
+def extraer_segun_id(maquina_id ,dato):
+    engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
+    with engine.connect() as connection:
+        result = connection.execute(sqlalchemy.text(f'''
+            SELECT {dato} FROM maquinas WHERE id = :maquina_id
+        '''), {"maquina_id": maquina_id})
+        return result.fetchone()[0] #devuelve el dato solicitado de la maquina con el id dado
 #test
 if __name__ == "__main__":
     crear_db() #ok
@@ -73,4 +80,6 @@ if __name__ == "__main__":
     #agregar_incidente(2, "2024-06-01", "Resuelto", "Falla en el motor", 200.00, 4) #ok
     #eliminar_maquina(1) #ok ,elimina la maquina con id 1
     print(obtener_maquinas()) #ok ,muestra todas las maquinas en la base de datos
+    for id in obtener_maquinas():
+        print(extraer_segun_id(id, "nombre")) #ok ,muestra el nombre de cada maquina en la base de datos
     print("listo") 
