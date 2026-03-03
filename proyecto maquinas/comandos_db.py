@@ -1,3 +1,4 @@
+import os
 import sys
 import sqlalchemy
 
@@ -31,6 +32,7 @@ def crear_db():#(anda) crea la base de datos y las tablas ,si ya existen no hace
         ''')
         )
         connection.commit()#guarda los cambios en la base de datos
+        print("Base de datos creada correctamente")
 
 def agregar_maquina(nombre, estado, modelo, marca, costo):#(anda) agrega una maquina a la base de datos
     engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
@@ -73,13 +75,44 @@ def extraer_segun_id(maquina_id ,dato):
             SELECT {dato} FROM maquinas WHERE id = :maquina_id
         '''), {"maquina_id": maquina_id})
         return result.fetchone()[0] #devuelve el dato solicitado de la maquina con el id dado
+    
+def acceder_a_img (maquina_id):
+    nombre_carpeta = f"maquina_{maquina_id}"
+    ruta_img = os.path.join(nombre_carpeta, "foto.jpg")
+    if os.path.exists(ruta_img):
+        print(f"Imagen encontrada para la máquina con ID {maquina_id}: {ruta_img}")
+        return ruta_img
+    else:
+        print(f"No se encontró la imagen para la máquina con ID {maquina_id}.")
+        return None
+def obtener_incidentes(maquina_id): #id maquina fecha(dd-mm-aaaa hh-mm-ss) estado descripcion costos tiempo_de_parada
+    engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
+    with engine.connect() as connection:
+        result = connection.execute(sqlalchemy.text('''
+            SELECT * FROM incidentes WHERE maquina_id = :maquina_id
+        '''), {"maquina_id": maquina_id})
+        return result.fetchall() #devuelve una lista con los incidentes de la maquina con el id dado
+    
+def mostrar_tabla():
+    engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
+    with engine.connect() as connection:
+        result = connection.execute(sqlalchemy.text('''
+            SELECT * FROM maquinas
+        '''))
+        for row in result.fetchall():
+            print(row)
 #test
-if __name__ == "__main__":
-    crear_db() #ok
-    #agregar_maquina("freza", "Operativo", "T-1000", "MarcaX", 5000.00) #ok ,agrega otra maquina igual si corre varias veces
-    #agregar_incidente(2, "2024-06-01", "Resuelto", "Falla en el motor", 200.00, 4) #ok
-    #eliminar_maquina(1) #ok ,elimina la maquina con id 1
-    print(obtener_maquinas()) #ok ,muestra todas las maquinas en la base de datos
-    for id in obtener_maquinas():
-        print(extraer_segun_id(id, "nombre")) #ok ,muestra el nombre de cada maquina en la base de datos
-    print("listo") 
+# if __name__ == "__main__":
+#     crear_db() #ok
+#     #agregar_maquina("freza", "Operativo", "T-1000", "MarcaX", 5000.00) #ok ,agrega otra maquina igual si corre varias veces
+#     #agregar_incidente(2, "2024-06-01", "Resuelto", "Falla en el motor", 200.00, 4) #ok
+#     #eliminar_maquina(1) #ok ,elimina la maquina con id 1
+#     print(obtener_maquinas()) #ok ,muestra todas las maquinas en la base de datos
+#     for id in obtener_maquinas():
+#         print(extraer_segun_id(id, "nombre")) #ok ,muestra el nombre de cada maquina en la base de datos
+#     print("listo") 
+#     # for id_maquina in obtener_maquinas():
+#     #     nombre_carpeta = f"maquina_{id_maquina}"
+#     #     os.makedirs(nombre_carpeta, exist_ok=True)
+#     #     print(f"Carpeta creada: {nombre_carpeta}")
+

@@ -1,7 +1,9 @@
 import sys
+from pathlib import Path
 import comandos_db as cdb
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets ,QtCore
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy
+from PyQt6.QtGui import QPixmap
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -76,6 +78,21 @@ class MainWindow(QWidget):
         label = QLabel(f"Detalles de {cdb.extraer_segun_id(nombre, 'nombre')}")
         label.setStyleSheet("font-size: 16px; background-color: lightyellow; padding: 10px; color:black;")
         self.layout_derecho.addWidget(label)
+        ruta_imagen = Path(cdb.acceder_a_img(nombre))
+
+        label_foto = QLabel()
+        label_foto.setStyleSheet("background-color: lightyellow;")
+        if ruta_imagen.exists():
+            pixmap = QPixmap(str(ruta_imagen))
+            # escalar la imagen para que no se desborde
+            pixmap = pixmap.scaledToWidth(300)
+            label_foto.setPixmap(pixmap)
+            label_foto.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        else:
+            label_foto.setText("Imagen no encontrada")
+
+        self.layout_derecho.addWidget(label_foto)
+
 
 
 if __name__ == "__main__":
