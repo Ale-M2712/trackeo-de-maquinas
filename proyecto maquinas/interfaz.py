@@ -82,6 +82,8 @@ class MainWindow(QWidget):
 
         label_foto = QLabel()
         label_foto.setStyleSheet("background-color: lightyellow;")
+
+        
         if ruta_imagen.exists():
             pixmap = QPixmap(str(ruta_imagen))
             # escalar la imagen para que no se desborde
