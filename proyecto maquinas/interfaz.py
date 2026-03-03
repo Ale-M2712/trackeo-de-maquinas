@@ -4,6 +4,8 @@ import comandos_db as cdb
 from PyQt6 import QtWidgets ,QtCore
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy
 from PyQt6.QtGui import QPixmap
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+import graficos
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -94,6 +96,10 @@ class MainWindow(QWidget):
             label_foto.setText("Imagen no encontrada")
 
         self.layout_derecho.addWidget(label_foto)
+
+        canvas = FigureCanvas(graficos.graficos_incidentes(graficos.preparar_datos(nombre)))
+        self.layout_derecho.addWidget(canvas)
+
 
 
 
