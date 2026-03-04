@@ -85,7 +85,7 @@ class MainWindow(QWidget):
 
         self.layout_primigenio.addWidget(contenedor_principal)
         self.setLayout(self.layout_primigenio)
-    def dialogo_agregar_maquina(self):
+    def dialogo_agregar_maquina(self): #funciona ,solo tengo que mejorar el estilo
         dialogo = QDialog(self)
         dialogo.setWindowTitle("Agregar Máquina")
         dialogo.resize(300, 200)
@@ -106,9 +106,9 @@ class MainWindow(QWidget):
 
         label_estado = QLabel("Estado:")
         label_estado.setStyleSheet("color: black; font-weight: bold;")
-        estado_input = QLineEdit()
-        estado_input.setPlaceholderText("Estado")
-        estado_input.setStyleSheet("background-color: lightgray;")
+        combo_estado = QtWidgets.QComboBox()
+        combo_estado.addItems(["Operativa", "En reparación", "Fuera de servicio"])
+        combo_estado.setStyleSheet("background-color: lightgray;")
 
         label_modelo = QLabel("Modelo:")
         label_modelo.setStyleSheet("color: black; font-weight: bold;")
@@ -131,7 +131,7 @@ class MainWindow(QWidget):
         layout.addWidget(nombre_label)
         layout.addWidget(nombre_input)
         layout.addWidget(label_estado)
-        layout.addWidget(estado_input)
+        layout.addWidget(combo_estado)
         layout.addWidget(label_modelo)
         layout.addWidget(modelo_input)
         layout.addWidget(label_marca)
@@ -145,10 +145,10 @@ class MainWindow(QWidget):
         # función interna para procesar y guardar los datos
         def guardar():
             nombre = nombre_input.text().strip()
-            estado = estado_input.text().strip()
+            estado = combo_estado.currentText()
             modelo = modelo_input.text().strip()
             marca = marca_input.text().strip()
-            costo_text = costo_input.int().strip()
+            costo_text = costo_input.text().strip()
             try:
                 costo = float(costo_text) if costo_text else 0.0
             except ValueError:
@@ -170,13 +170,20 @@ class MainWindow(QWidget):
         dialogo.setLayout(layout_principal)
 
         dialogo.exec()
-    def dialogo_eliminar_maquina(self):
+    def dialogo_eliminar_maquina(self): #mostrar maquinas en combobox para eliminar, no es necesario escribir el id
         dialogo = QDialog(self)
         dialogo.setWindowTitle("Eliminar Máquina")
         dialogo.resize(300, 150)
         layout = QVBoxLayout()
         label = QLabel("Ingrese el ID de la máquina a eliminar:")
+        combo_maquinas = QtWidgets.QComboBox()
+        maquinas = cdb.mostrar_tabla()
+        for maquina in maquinas:
+            combo_maquinas.addItem(maquina["nombre"], userData=maquina["id"])
+        
         layout.addWidget(label)
+        layout.addWidget(combo_maquinas)
+       
         dialogo.setLayout(layout)
         dialogo.exec()
         pass
