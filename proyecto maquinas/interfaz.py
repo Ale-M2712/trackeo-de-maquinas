@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import comandos_db as cdb
 from PyQt6 import QtWidgets ,QtCore
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy, QDialog
 from PyQt6.QtGui import QPixmap
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import graficos
@@ -15,9 +15,16 @@ class MainWindow(QWidget):
         self.resize(800, 600)
 
         # Layout principal (horizontal)
+        self.layout_primigenio = QHBoxLayout()
+        contenedor_principal = QWidget() #con esto le doy color al fondo de la ventana
+        contenedor_principal.setStyleSheet("background-color: white;")
         self.layout_principal = QHBoxLayout()
+        contenedor_principal.setLayout(self.layout_principal)
 
         # --- Menú izquierdo ---
+        contenedor = QWidget() #con esto le doy color al menu izquierdo
+        contenedor.setStyleSheet("background-color: lightgray;")
+
         self.layout_izquierdo = QVBoxLayout()
 
         self.selecion_maquinas = QVBoxLayout()
@@ -37,6 +44,8 @@ class MainWindow(QWidget):
                 background-color: darkgreen;
             }
         """)
+        self.boton_agregar.clicked.connect(self.lista_maquinas) #actualiza la lista de maquinas al agregar una nueva
+
         self.boton_eliminar = QPushButton("Eliminar Máquina")
         self.boton_eliminar.setStyleSheet("""
             QPushButton {
@@ -50,28 +59,45 @@ class MainWindow(QWidget):
                 background-color: darkred;
             }
         """)
-        self.agregar_y_eliminar.setStyleSheet("background-color: lightgray; padding: 10px;")
+        self.boton_eliminar.clicked.connect(self.dialogo_eliminar_maquina) #abre un dialogo para eliminar una maquina
 
         self.agregar_y_eliminar.addWidget(self.boton_agregar)
         self.agregar_y_eliminar.addWidget(self.boton_eliminar)
         
         self.agregar_y_eliminar.addStretch(0)  # Espacio flexible para separar los botones de la lista el orden importa
 
+        contenedor.setLayout(self.layout_izquierdo)
         # --- Panel derecho ---
+        contenedor_derecho = QWidget() #con esto le doy color al menu derecho
+        contenedor_derecho.setStyleSheet("background-color: lightyellow;")
         self.layout_derecho = QVBoxLayout()
         self.label_derecho = QLabel("Selecciona una máquina")
         self.layout_derecho.addWidget(self.label_derecho)
+        contenedor_derecho.setLayout(self.layout_derecho)
 
         # Agregar los layouts al layout principal
-        self.layout_principal.addLayout(self.layout_izquierdo, stretch=1)
-        self.layout_principal.addLayout(self.layout_derecho, stretch=4)
+        self.layout_principal.addWidget(contenedor, stretch=1)
+        self.layout_principal.addWidget(contenedor_derecho, stretch=4)
 
         self.layout_izquierdo.addLayout(self.agregar_y_eliminar,stretch=1)
         self.layout_izquierdo.addLayout(self.selecion_maquinas,stretch=20)
         
 
-        self.setLayout(self.layout_principal)
-
+        self.layout_primigenio.addWidget(contenedor_principal)
+        self.setLayout(self.layout_primigenio)
+    def dialogo_agregar_maquina(self):
+        # Aquí puedes implementar un diálogo para agregar una nueva máquina
+        pass
+    def dialogo_eliminar_maquina(self):
+        dialogo = QDialog(self)
+        dialogo.setWindowTitle("Eliminar Máquina")
+        dialogo.resize(300, 150)
+        layout = QVBoxLayout()
+        label = QLabel("Ingrese el ID de la máquina a eliminar:")
+        layout.addWidget(label)
+        dialogo.setLayout(layout)
+        dialogo.exec()
+        pass
     def showEvent(self, event):
         super().showEvent(event)
         # Poblar los botones cuando la ventana ya tiene tamaño válido
