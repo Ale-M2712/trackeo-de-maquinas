@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 import comandos_db as cdb
 from PyQt6 import QtWidgets ,QtCore
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy, QDialog
+from PyQt6.QtWidgets import QApplication, QLineEdit, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy, QDialog
 from PyQt6.QtGui import QPixmap
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import graficos
@@ -44,7 +44,7 @@ class MainWindow(QWidget):
                 background-color: darkgreen;
             }
         """)
-        self.boton_agregar.clicked.connect(self.lista_maquinas) #actualiza la lista de maquinas al agregar una nueva
+        self.boton_agregar.clicked.connect(self.dialogo_agregar_maquina) #actualiza la lista de maquinas al agregar una nueva
 
         self.boton_eliminar = QPushButton("Eliminar Máquina")
         self.boton_eliminar.setStyleSheet("""
@@ -86,8 +86,90 @@ class MainWindow(QWidget):
         self.layout_primigenio.addWidget(contenedor_principal)
         self.setLayout(self.layout_primigenio)
     def dialogo_agregar_maquina(self):
-        # Aquí puedes implementar un diálogo para agregar una nueva máquina
-        pass
+        dialogo = QDialog(self)
+        dialogo.setWindowTitle("Agregar Máquina")
+        dialogo.resize(300, 200)
+
+        # contenedor con fondo para todo el contenido del diálogo
+        contenedor_dialogo = QWidget()
+        contenedor_dialogo.setStyleSheet("background-color: white;")
+        layout = QVBoxLayout(contenedor_dialogo)
+
+        label = QLabel("Ingrese los detalles de la nueva máquina:")
+        layout.addWidget(label)
+
+        nombre_label = QLabel("Nombre:")
+        nombre_label.setStyleSheet("color: black; font-weight: bold;")
+        nombre_input = QLineEdit()
+        nombre_input.setPlaceholderText("Nombre")
+        nombre_input.setStyleSheet("background-color: lightgray;")
+
+        label_estado = QLabel("Estado:")
+        label_estado.setStyleSheet("color: black; font-weight: bold;")
+        estado_input = QLineEdit()
+        estado_input.setPlaceholderText("Estado")
+        estado_input.setStyleSheet("background-color: lightgray;")
+
+        label_modelo = QLabel("Modelo:")
+        label_modelo.setStyleSheet("color: black; font-weight: bold;")
+        modelo_input = QLineEdit()
+        modelo_input.setPlaceholderText("Modelo")
+        modelo_input.setStyleSheet("background-color: lightgray;")
+
+        label_marca = QLabel("Marca:")
+        label_marca.setStyleSheet("color: black; font-weight: bold;")
+        marca_input = QLineEdit()
+        marca_input.setPlaceholderText("Marca")
+        marca_input.setStyleSheet("background-color: lightgray;")
+
+        label_costo = QLabel("Costo:")
+        label_costo.setStyleSheet("color: black; font-weight: bold;")
+        costo_input = QLineEdit()
+        costo_input.setPlaceholderText("Costo")
+        costo_input.setStyleSheet("background-color: lightgray;")
+
+        layout.addWidget(nombre_label)
+        layout.addWidget(nombre_input)
+        layout.addWidget(label_estado)
+        layout.addWidget(estado_input)
+        layout.addWidget(label_modelo)
+        layout.addWidget(modelo_input)
+        layout.addWidget(label_marca)
+        layout.addWidget(marca_input)
+        layout.addWidget(label_costo)
+        layout.addWidget(costo_input)
+
+        boton_guardar = QPushButton("Guardar")
+        layout.addWidget(boton_guardar)
+
+        # función interna para procesar y guardar los datos
+        def guardar():
+            nombre = nombre_input.text().strip()
+            estado = estado_input.text().strip()
+            modelo = modelo_input.text().strip()
+            marca = marca_input.text().strip()
+            costo_text = costo_input.int().strip()
+            try:
+                costo = float(costo_text) if costo_text else 0.0
+            except ValueError:
+                costo = 0.0
+
+            if nombre:
+                cdb.agregar_maquina(nombre, estado, modelo, marca, costo)
+                dialogo.accept()
+                self.lista_maquinas()
+            else:
+                # podría mostrar mensaje de error aquí
+                pass
+
+        boton_guardar.clicked.connect(guardar)
+
+        # asigno el layout principal al diálogo
+        layout_principal = QVBoxLayout()
+        layout_principal.addWidget(contenedor_dialogo)
+        dialogo.setLayout(layout_principal)
+
+        dialogo.exec()
     def dialogo_eliminar_maquina(self):
         dialogo = QDialog(self)
         dialogo.setWindowTitle("Eliminar Máquina")
