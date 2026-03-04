@@ -60,6 +60,7 @@ def eliminar_maquina(maquina_id):#(anda) elimina la maquina con el id dado
             DELETE FROM maquinas WHERE id = :maquina_id
         '''), {"maquina_id": maquina_id})
         connection.commit()
+    print(f"Máquina con ID {maquina_id} eliminada correctamente")
 
 def obtener_maquinas():#(anda) obtiene todas las maquinas de la base de datos
     engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
@@ -101,6 +102,13 @@ def mostrar_tabla():
         '''))
         for row in result.fetchall():
             print(row)
+def tabla_maquinas():
+    engine = sqlalchemy.create_engine("sqlite:///maquinas.db")
+    with engine.connect() as connection:
+        result = connection.execute(sqlalchemy.text('''
+            SELECT * FROM maquinas
+        '''))
+        return result.fetchall() #devuelve una lista con todas las maquinas de la base de datos
 #test
 # if __name__ == "__main__":
 #     crear_db() #ok

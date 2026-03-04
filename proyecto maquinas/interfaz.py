@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QApplication, QLineEdit, QWidget, QLabel, QHBoxLayou
 from PyQt6.QtGui import QPixmap
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 import graficos
+import pandas as pd
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -170,23 +171,27 @@ class MainWindow(QWidget):
         dialogo.setLayout(layout_principal)
 
         dialogo.exec()
-    def dialogo_eliminar_maquina(self): #mostrar maquinas en combobox para eliminar, no es necesario escribir el id
+    def dialogo_eliminar_maquina(self): #funciona
         dialogo = QDialog(self)
         dialogo.setWindowTitle("Eliminar Máquina")
         dialogo.resize(300, 150)
         layout = QVBoxLayout()
         label = QLabel("Ingrese el ID de la máquina a eliminar:")
         combo_maquinas = QtWidgets.QComboBox()
-        maquinas = cdb.mostrar_tabla()
-        for maquina in maquinas:
-            combo_maquinas.addItem(maquina["nombre"], userData=maquina["id"])
-        
+        maquinas = pd.DataFrame(cdb.tabla_maquinas())
+        cdb.mostrar_tabla()#esto es solo para ver
+        for maquina in maquinas.itertuples(index=False):
+            maquina_id = maquina[0]# asumiendo que el ID está en la primera columna
+            maquina_nombre = f"{maquina[1]}   {maquina[3]}"# asumiendo que el nombre está en la segunda columna
+            combo_maquinas.addItem(maquina_nombre,maquina_id)#no esta agregando a la lista
+        boton_eliminar = QPushButton("Eliminar")
+        boton_eliminar.clicked.connect(lambda: cdb.eliminar_maquina(combo_maquinas.currentData())) #elimina la maquina seleccionada en el combo box
         layout.addWidget(label)
         layout.addWidget(combo_maquinas)
-       
+        layout.addWidget(boton_eliminar)
+
         dialogo.setLayout(layout)
         dialogo.exec()
-        pass
     def showEvent(self, event):
         super().showEvent(event)
         # Poblar los botones cuando la ventana ya tiene tamaño válido
